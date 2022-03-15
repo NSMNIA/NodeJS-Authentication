@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import ErrorText from '../../components/ErrorText';
 import { Link, useNavigate } from 'react-router-dom';
 import Axios from 'axios';
@@ -11,7 +11,7 @@ const Login: React.FunctionComponent = (props: Props) => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
-    const [loginStatus, setLoginStatus] = useState<string>('');
+    const [loginStatus, setLoginStatus] = useState<boolean>(false);
 
     const history = useNavigate();
 
@@ -28,22 +28,15 @@ const Login: React.FunctionComponent = (props: Props) => {
             if (response.data.success === 0) {
                 setError(response.data.message);
                 setAuthenticating(false);
-                return Logging.error(response.data);
+                return Logging.error(response.data.message);
             }
-            Logging.info(response.data);
+            localStorage.setItem("token", `${response.data.token}`);
+            return history('/');
         }).catch(err => {
             Logging.error(err);
             setAuthenticating(false);
         })
     }
-
-    useEffect(()=>{
-        Axios.get(`${import.meta.env.VITE_APP_SERVER}/login`).then(response => {
-            Logging.info(response);
-            if(response.data.loggedIn !== true) return setLoginStatus('');
-            return setLoginStatus(response.data.user[0].username);
-        })
-    }, []);
 
     return (
         <>

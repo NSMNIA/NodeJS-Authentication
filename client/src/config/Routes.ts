@@ -20,7 +20,7 @@ const routes: IRoute[] = [
         path: '/login',
         element: Login,
         name: "Login page",
-        protected: true
+        protected: false
     }
 ];
 

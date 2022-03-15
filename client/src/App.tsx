@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import AuthRoute from './components/AuthRoute';
 import routes from './config/Routes';
 import ErrorPage from './pages/Error';
 
@@ -21,10 +22,10 @@ const App: React.FunctionComponent = (props: Props) => {
       <Router>
         <Routes>
           {routes.map((route, index) => {
-            // if (route.protected)
-            //   return <Route key={index}
-            //     path={route.path}
-            //     element={<AuthRoute><route.element /></AuthRoute>} />
+            if (route.protected)
+              return <Route key={index}
+                path={route.path}
+                element={<AuthRoute><route.element/></AuthRoute>} />
 
             return <Route key={index}
               path={route.path}

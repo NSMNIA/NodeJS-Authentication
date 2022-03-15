@@ -5,6 +5,7 @@ import cors from 'cors';
 import bcrypt from 'bcrypt';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import jwt from 'jsonwebtoken';
 import 'dotenv/config'
 
 const saltRounds = 10;
@@ -19,7 +20,7 @@ const db = mysql.createPool({
 })
 
 let allowedOrigins = [
-    `${process.env.ORIGIN}`
+    `${process.env.PRODUCTION_URL}`
 ];
 
 app.use(cors({
@@ -43,7 +44,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(session({
     key: "crm_uid",
-    secret: "test_key",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -90,20 +91,38 @@ app.post('/api/login', (req, res) => {
             bcrypt.compare(password, result[0].password, (error, response) => {
                 if(error) return res.send({success: 0, message: error});
                 if (!response) return res.send({ success: 0, message: "Wrong email/password combination."});
-
+                const id = result[0].id;
+                const token = jwt.sign({id}, process.env.JWT_SECRET, {
+                    expiresIn: 300,
+                });
+                delete result[0].password
                 req.session.user = result;
-                return res.send({success: 1, message: 'User validated.'});
+                return res.json({success: 1, message: 'User validated.', token: token, result: result});
             });
         });
 })
 
-app.get('/api/login', (req, res)=> {
-    if(!req.session.user) return res.send({loggedIn: false});
-    return res.send({
-            loggedIn: true,
-            user: req.session.user
-        });
+const verifyJWT = (req,res,next) => {
+    const token = req.headers['x-access-token'];
+    if(!token) return res.send({success: 0, message: "No token found."})
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if(err) return res.send({success: 0, message: "Token not valid."});
+        req.userId = decoded.id;
+        next();
+    })
+}
+
+app.get('/api/isAuth', verifyJWT, (req, res) => {
+    res.send({success: 1, message: "User is authenticated"});
 })
+
+// app.get('/api/login', (req, res)=> {
+//     if(!req.session.user) return res.send({loggedIn: false});
+//     return res.send({
+//             loggedIn: true,
+//             user: req.session.user
+//         });
+// })
 
 app.listen(3001, () => {
     console.log('Running on port 3001');
