@@ -2,7 +2,10 @@ import express from 'express';
 import mysql from 'mysql';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import bcrypt from 'bcrypt';
 import 'dotenv/config'
+
+const saltRounds = 10;
 
 const app = express();
 
@@ -36,21 +39,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post('/api/register', (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
+
     const checkIfUserExist = 'SELECT * FROM `users` WHERE `email` = ? LIMIT 1';
     db.query(checkIfUserExist,
         [email],
         (err,result)=> {
             if(err) return res.send({success: 0, message: err});
             if(result.length >= 1) return res.send({success: 0, message: "Email already in use."});
-            const sqlQuery = "INSERT INTO `users` (`email`, `password`, `role`) VALUES (?,?,1)";
-            db.query(sqlQuery,
-                [email, password],
-                (err, result)=> {
-                    if(err) return res.send({success: 0, message: err});
-                    if(!result) return res.send({success: 0, message: "Wrong combination."})
-                    return res.send({success: 1, message: 'User has been added.'});
-                }
-            );
+            bcrypt.hash(password, saltRounds, (err, hash) => {
+                if(err) return res.send({success: 0, message: err})
+                const sqlQuery = "INSERT INTO `users` (`email`, `password`, `role`) VALUES (?,?,1)";
+                db.query(sqlQuery,
+                    [email, hash],
+                    (err, result)=> {
+                        if(err) return res.send({success: 0, message: err});
+                        if(!result) return res.send({success: 0, message: "Wrong combination."})
+                        return res.send({success: 1, message: 'User has been added.'});
+                    }
+                );
+            })
         }
     );
 })
