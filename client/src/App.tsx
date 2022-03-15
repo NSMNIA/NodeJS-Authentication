@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import routes from './config/Routes';
+import ErrorPage from './pages/Error';
 
 type Props = {}
 
@@ -31,6 +32,7 @@ const App: React.FunctionComponent = (props: Props) => {
             />
           }
           )}
+          <Route path='*' element={<ErrorPage statusCode={404} statusMessage={"Not found"} />} />
         </Routes>
       </Router>
     </>

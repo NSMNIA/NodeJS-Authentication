@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import Axios from 'axios';
 import ErrorText from '../../components/ErrorText';
 import Logging from '../../config/Logging';
+import { Link } from 'react-router-dom';
 
-type Props = {
-
-}
+type Props = {}
 
 const validateEmail: Function = (email: string) => {
     var re = /\S+@\S+\.\S+/;
@@ -22,8 +21,11 @@ const Register: React.FunctionComponent = (props: Props) => {
 
     const history = useNavigate();
 
+    Axios.defaults.withCredentials = true
+
     const registerUser = () => {
         if (error !== '') setError('');
+        if(email.length === 0 || password.length === 0) return setError('All fields are required.');
         if (password !== confirm) return setError('Please make sure your password match.');
         if (!validateEmail(email)) return setError('Not a valid email address.');
         setRegistering(true);
@@ -53,6 +55,9 @@ const Register: React.FunctionComponent = (props: Props) => {
                 Sign up
             </button>
             <ErrorText error={error} />
+            <small>
+                <p><Link to="/login">Login</Link></p>
+            </small>
         </>
     )
 }
