@@ -1,4 +1,5 @@
 import IRoute from "../interfaces/Routes";
+import Register from "../pages/Auth/Register";
 import Home from "../pages/Home";
 
 const routes: IRoute[] = [
@@ -7,6 +8,12 @@ const routes: IRoute[] = [
         element: Home,
         name: 'Home Page',
         protected: true
+    },
+    {
+        path: '/register',
+        element: Register,
+        name: 'Register page',
+        protected: false
     }
 ];
 
