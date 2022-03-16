@@ -13,13 +13,17 @@ const Login: React.FunctionComponent = (props: Props) => {
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
     const { setAuthState, authState } = useContext(AuthContext);
-    if (authState.status) return <Navigate to={'/'} />
 
     const history = useNavigate();
+    useEffect(() => {
+        if (authState.status) return history('/');
+    }, [])
+
 
     Axios.defaults.withCredentials = true
 
-    const signIn = () => {
+    const signIn = (e: React.SyntheticEvent) => {
+        e.preventDefault();
         if (error !== '') setError('');
         if (email.length === 0 || password.length === 0) return setError('All fields are required.');
         setAuthenticating(true);
@@ -52,10 +56,12 @@ const Login: React.FunctionComponent = (props: Props) => {
     return (
         <>
             <h1>Login</h1>
-            <input type="email" name='email' value={email} placeholder="Email address" onChange={e => setEmail(e.target.value)} />
-            <input type="password" name='password' value={password} placeholder="Password" onChange={e => setPassword(e.target.value)} />
-            <button disabled={authenticating} onClick={e => signIn()}>Log in</button>
-            <ErrorText error={error} />
+            <form action="" method='post' onSubmit={signIn}>
+                <input type="email" name='email' value={email} placeholder="Email address" onChange={e => setEmail(e.target.value)} />
+                <input type="password" name='password' value={password} placeholder="Password" onChange={e => setPassword(e.target.value)} />
+                <button disabled={authenticating}>Log in</button>
+                <ErrorText error={error} />
+            </form>
             <small>
                 <p><Link to="/register">Register</Link></p>
             </small>
