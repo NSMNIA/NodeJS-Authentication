@@ -7,12 +7,14 @@ require('dotenv/config');
 const { validateToken } = require('../middleware/AuthMiddleware');
 
 router.post('/register', async (req, res) => {
-    const { email, password } = req.body;
+    const { firstname, lastname, email, password } = req.body;
     const user = await Users.findOne({ where: { email: email } });
     if (user) return res.json({ success: 0, message: 'Email is already in use.' });
     bcrypt.hash(password, 11).then((hash) => {
         Users.create({
             email: email,
+            firstname: firstname,
+            lastname: lastname,
             password: hash,
             rid: 1
         });
@@ -36,6 +38,13 @@ router.post('/login', async (req, res) => {
 
 router.get('/check', validateToken, (req, res) => {
     return res.json({ success: 1, message: 'User is authenticated', user: req.user });
+})
+
+router.get('/profile', validateToken, async (req, res) => {
+    const user = await Users.findOne({ where: { email: req.user.email, uid: req.user.uid } });
+    if (!user) return res.json({ success: 0, message: 'User doens\'t exist' });
+    user.password = undefined;
+    return res.json({ success: 1, message: 'Succeeded with fetching data.', user: user });
 })
 
 module.exports = router;

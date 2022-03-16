@@ -3,7 +3,6 @@ require('dotenv/config');
 
 const validateToken = (req, res, next) => {
     const accessToken = req.header('accessToken');
-    console.log(accessToken);
     if (!accessToken) return res.json({ success: 0, message: "User not logged in." });
 
     try {
