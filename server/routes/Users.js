@@ -4,6 +4,7 @@ const { Users } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv/config');
+const { validateToken } = require('../middleware/AuthMiddleware');
 
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
@@ -26,14 +27,15 @@ router.post('/login', async (req, res) => {
 
     bcrypt.compare(password, user.password).then((match) => {
         if (!match) return res.json({ success: 0, message: "Wrong email/password combination." });
-        const id = match.id;
-        delete match.password;
-        const token = jwt.sign({ id }, process.env.JWT_SECRET, {
+        const accessToken = jwt.sign({ email: user.email, uid: user.uid }, process.env.JWT_SECRET, {
             expiresIn: 60 * 60 * 24 * 31,
         });
-        req.session.user = match;
-        return res.json({ success: 1, message: 'User validated.', token: token, result: match });
+        return res.json({ success: 1, message: 'User validated.', token: accessToken });
     });
 });
+
+router.get('/check', validateToken, (req, res) => {
+    return res.json({ success: 1, message: 'User is authenticated' });
+})
 
 module.exports = router;

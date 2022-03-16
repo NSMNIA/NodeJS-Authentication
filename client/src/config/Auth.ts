@@ -2,9 +2,9 @@ import Axios from 'axios';
 import Logging from './Logging';
 
 const Auth = () => {
-    let authenticated: Promise<boolean> = Axios.get(`${import.meta.env.VITE_APP_SERVER}/isAuth`, {
+    let authenticated: Promise<boolean> = Axios.get(`${import.meta.env.VITE_APP_SERVER}/auth/check`, {
         headers: {
-            "x-access-token": localStorage.getItem("token")
+            "accessToken": sessionStorage.getItem("token")
         } as any
     }).then(response => {
         if (response.data.success !== 1) {
@@ -21,7 +21,7 @@ const Auth = () => {
 }
 
 export const getAuth = () => {
-    Logging.info('Test');
+    // Logging.info('Test');
 }
 
 export default Auth;

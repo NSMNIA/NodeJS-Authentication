@@ -36,7 +36,7 @@ const Register: React.FunctionComponent = (props: Props) => {
             if (response.data.success === 0) {
                 setError(response.data.message);
                 setRegistering(false);
-                return Logging.error(response.data);
+                return Logging.error(response.data.message);
             }
             Logging.info(response.data);
         }).catch(err => {

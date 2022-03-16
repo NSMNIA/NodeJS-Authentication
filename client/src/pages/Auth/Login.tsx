@@ -31,7 +31,7 @@ const Login: React.FunctionComponent = (props: Props) => {
                 return Logging.error(response.data.message);
             }
             Logging.info(response.data);
-            localStorage.setItem("token", `${response.data.token}`);
+            sessionStorage.setItem("token", `${response.data.token}`);
             return history('/');
         }).catch(err => {
             Logging.error(err);

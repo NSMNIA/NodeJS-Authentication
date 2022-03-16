@@ -1,10 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const jwt = require('jsonwebtoken');
 require('dotenv/config');
 const db = require('./models');
 
@@ -46,20 +44,6 @@ app.use(session({
 // Routers
 const userRouter = require('./routes/Users');
 app.use("/auth", userRouter)
-
-const verifyJWT = (req, res, next) => {
-    const token = req.headers['x-access-token'];
-    if (!token) return res.send({ success: 0, message: "No token found." })
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) return res.send({ success: 0, message: "Token not valid." });
-        req.userId = decoded.id;
-        next();
-    })
-}
-
-app.get('/api/isAuth', verifyJWT, (req, res) => {
-    res.send({ success: 1, message: "User is authenticated" });
-})
 
 db.sequelize.sync().then(() => {
     app.listen(3001, () => {
