@@ -1,6 +1,7 @@
 import IRoute from "../interfaces/Routes";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
+import Client from "../pages/Client";
 import Home from "../pages/Home";
 
 const routes: IRoute[] = [
@@ -21,6 +22,11 @@ const routes: IRoute[] = [
         element: Login,
         name: "Login page",
         protected: false
+    }, {
+        path: '/client',
+        element: Client,
+        name: "Client page",
+        protected: true
     }
 ];
 

@@ -25,21 +25,21 @@ const Register: React.FunctionComponent = (props: Props) => {
 
     const registerUser = () => {
         if (error !== '') setError('');
-        if(email.length === 0 || password.length === 0) return setError('All fields are required.');
+        if (email.length === 0 || password.length === 0) return setError('All fields are required.');
         if (password !== confirm) return setError('Please make sure your password match.');
         if (!validateEmail(email)) return setError('Not a valid email address.');
         setRegistering(true);
-        Axios.post(`${import.meta.env.VITE_APP_SERVER}/register`, {
+        Axios.post(`${import.meta.env.VITE_APP_SERVER}/auth/register`, {
             email: email,
             password: password
         }).then(response => {
-            if(response.data.success === 0){
+            if (response.data.success === 0) {
                 setError(response.data.message);
                 setRegistering(false);
                 return Logging.error(response.data);
             }
             Logging.info(response.data);
-        }).catch(err=>{
+        }).catch(err => {
             Logging.error(err);
             setRegistering(false);
         })

@@ -9,11 +9,11 @@ type Props = {}
 const App: React.FunctionComponent = (props: Props) => {
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(()=>{
+  useEffect(() => {
     setLoading(false);
   }, [])
 
-  if(loading)
+  if (loading)
     return <div>Loading...</div>
 
 
@@ -25,7 +25,7 @@ const App: React.FunctionComponent = (props: Props) => {
             if (route.protected)
               return <Route key={index}
                 path={route.path}
-                element={<AuthRoute><route.element/></AuthRoute>} />
+                element={<AuthRoute><route.element /></AuthRoute>} />
 
             return <Route key={index}
               path={route.path}

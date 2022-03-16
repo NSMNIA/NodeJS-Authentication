@@ -19,9 +19,9 @@ const Login: React.FunctionComponent = (props: Props) => {
 
     const signIn = () => {
         if (error !== '') setError('');
-        if(email.length === 0 || password.length === 0) return setError('All fields are required.');
+        if (email.length === 0 || password.length === 0) return setError('All fields are required.');
         setAuthenticating(true);
-        Axios.post(`${import.meta.env.VITE_APP_SERVER}/login`, {
+        Axios.post(`${import.meta.env.VITE_APP_SERVER}/auth/login`, {
             email: email,
             password: password
         }).then(response => {
@@ -30,6 +30,7 @@ const Login: React.FunctionComponent = (props: Props) => {
                 setAuthenticating(false);
                 return Logging.error(response.data.message);
             }
+            Logging.info(response.data);
             localStorage.setItem("token", `${response.data.token}`);
             return history('/');
         }).catch(err => {

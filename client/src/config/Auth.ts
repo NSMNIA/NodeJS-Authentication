@@ -20,4 +20,8 @@ const Auth = () => {
     return authenticated;
 }
 
+export const getAuth = () => {
+    Logging.info('Test');
+}
+
 export default Auth;
