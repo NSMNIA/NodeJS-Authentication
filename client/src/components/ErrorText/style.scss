@@ -1,0 +1,12 @@
+.alert {
+  display: block;
+  width: max-content;
+  padding: 1em 1.5em;
+  font-weight: 700;
+  border-radius: 0.5em;
+  color: hsl(0, 100%, 0%);
+  &.alert--danger {
+    background-color: hsl(0, 69%, 42%);
+    color: hsl(0, 100%, 100%);
+  }
+}
