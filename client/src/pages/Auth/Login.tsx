@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import ErrorText from '../../components/ErrorText';
 import { Link, useNavigate } from 'react-router-dom';
 import Axios from 'axios';
 import Logging from '../../config/Logging';
+import { AuthContext } from '../../context/AuthContext';
 
 type Props = {}
 
@@ -12,6 +13,7 @@ const Login: React.FunctionComponent = (props: Props) => {
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [loginStatus, setLoginStatus] = useState<boolean>(false);
+    const { setAuthState } = useContext(AuthContext);
 
     const history = useNavigate();
 
@@ -31,7 +33,8 @@ const Login: React.FunctionComponent = (props: Props) => {
                 return Logging.error(response.data.message);
             }
             Logging.info(response.data);
-            sessionStorage.setItem("token", `${response.data.token}`);
+            localStorage.setItem("token", `${response.data.token}`);
+            setAuthState(true);
             return history('/');
         }).catch(err => {
             Logging.error(err);

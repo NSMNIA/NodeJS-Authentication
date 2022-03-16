@@ -8,6 +8,7 @@ const validateToken = (req, res, next) => {
 
     try {
         const validToken = verify(accessToken, process.env.JWT_SECRET);
+        req.user = validToken;
         if (!validToken) return res.json({ success: 0, message: "Not a valid token." })
         return next();
     } catch (err) {

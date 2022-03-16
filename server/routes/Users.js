@@ -35,7 +35,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/check', validateToken, (req, res) => {
-    return res.json({ success: 1, message: 'User is authenticated' });
+    return res.json({ success: 1, message: 'User is authenticated', user: req.user });
 })
 
 module.exports = router;
