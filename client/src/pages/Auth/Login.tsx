@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import ErrorText from '../../components/ErrorText';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Axios from 'axios';
 import Logging from '../../config/Logging';
 import { AuthContext } from '../../context/AuthContext';
@@ -12,10 +12,8 @@ const Login: React.FunctionComponent = (props: Props) => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
-    const [loginStatus, setLoginStatus] = useState<boolean>(false);
-    const { setAuthState } = useContext(AuthContext);
-
-    const history = useNavigate();
+    const { setAuthState, authState } = useContext(AuthContext);
+    if (authState.status) return <Navigate to={'/'} />
 
     Axios.defaults.withCredentials = true
 

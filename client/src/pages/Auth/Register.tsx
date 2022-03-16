@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from 'react'
+import { Navigate } from 'react-router-dom';
 import Axios from 'axios';
 import ErrorText from '../../components/ErrorText';
 import Logging from '../../config/Logging';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 
 type Props = {}
 
@@ -13,6 +14,7 @@ const validateEmail: Function = (email: string) => {
 }
 
 const Register: React.FunctionComponent = (props: Props) => {
+    const { authState } = useContext(AuthContext);
     const [registering, setRegistering] = useState<boolean>(false);
     const [email, setEmail] = useState<string>('');
     const [firstname, setFirstname] = useState<string>('');
@@ -21,7 +23,7 @@ const Register: React.FunctionComponent = (props: Props) => {
     const [confirm, setConfirm] = useState<string>('');
     const [error, setError] = useState<string>('');
 
-    const history = useNavigate();
+    if (authState.status) return <Navigate to={'/'} />
 
     Axios.defaults.withCredentials = true
 
