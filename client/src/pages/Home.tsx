@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { Link } from 'react-router-dom';
+import SignOut from '../components/SignOut';
 
 type Props = {}
 const Home: React.FunctionComponent = (props: Props) => {
@@ -9,8 +10,8 @@ const Home: React.FunctionComponent = (props: Props) => {
       <h1>
         Home
       </h1>
-      <Link to={'/client'} >Go to other protected page</Link>
-
+      <Link to={'/profile'} >Go to other profile page</Link>
+      <SignOut />
     </div>
   )
 }

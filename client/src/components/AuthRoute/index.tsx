@@ -10,7 +10,7 @@ export interface IAuthRouteProps {
 const AuthRoute: React.FunctionComponent<IAuthRouteProps> = (props) => {
     const { children } = props;
     const { authState } = useContext(AuthContext);
-    if (!authState) return <Navigate to={'/login'} />
+    if (!authState.status) return <Navigate to={'/login'} />
 
     return (
         <>

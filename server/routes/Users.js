@@ -30,7 +30,7 @@ router.post('/login', async (req, res) => {
         const accessToken = jwt.sign({ email: user.email, uid: user.uid }, process.env.JWT_SECRET, {
             expiresIn: 60 * 60 * 24 * 31,
         });
-        return res.json({ success: 1, message: 'User validated.', token: accessToken });
+        return res.json({ success: 1, message: 'User validated.', token: accessToken, user: { email: user.email, uid: user.uid } });
     });
 });
 

@@ -6,11 +6,13 @@ import ErrorPage from './pages/Error';
 import { AuthContext } from './context/AuthContext';
 import axios from 'axios';
 import Logging from './config/Logging';
+import IAuth, { Auth, defaultAuth } from './interfaces/Auth';
 
 type Props = {}
 
 const App: React.FunctionComponent = (props: Props) => {
-  const [authState, setAuthState] = useState<boolean>(false);
+  const [authState, setAuthState] = useState<Auth>(defaultAuth);
+
   const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_APP_SERVER}/auth/check`, {
@@ -19,10 +21,17 @@ const App: React.FunctionComponent = (props: Props) => {
       } as {}
     }).then((response) => {
       if (response.data.success === 0) {
-        setAuthState(false);
+        setAuthState(defaultAuth);
         return setLoading(false);
       }
-      setAuthState(true);
+      setAuthState({
+        email: response.data.user.email,
+        uid: response.data.user.uid,
+        tokens: {
+          accessToken: response.data.token
+        },
+        status: true
+      });
       return setLoading(false);
     })
   }, [])

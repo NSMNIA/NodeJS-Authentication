@@ -32,9 +32,16 @@ const Login: React.FunctionComponent = (props: Props) => {
                 setAuthenticating(false);
                 return Logging.error(response.data.message);
             }
-            Logging.info(response.data);
+            Logging.info(response.data.message);
             localStorage.setItem("token", `${response.data.token}`);
-            setAuthState(true);
+            setAuthState({
+                email: response.data.user.email,
+                uid: response.data.user.uid,
+                tokens: {
+                    accessToken: response.data.token
+                },
+                status: true
+            });
             return history('/');
         }).catch(err => {
             Logging.error(err);
