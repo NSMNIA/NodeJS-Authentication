@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import ErrorText from '../../components/ErrorText';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import Axios from 'axios';
 import Logging from '../../config/Logging';
 import { AuthContext } from '../../context/AuthContext';
@@ -14,6 +14,8 @@ const Login: React.FunctionComponent = (props: Props) => {
     const [error, setError] = useState<string>('');
     const { setAuthState, authState } = useContext(AuthContext);
     if (authState.status) return <Navigate to={'/'} />
+
+    const history = useNavigate();
 
     Axios.defaults.withCredentials = true
 
