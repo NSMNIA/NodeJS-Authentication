@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 module.exports = (sequelize, DataTypes) => {
     const Users = sequelize.define("Users", {
         uid: {
@@ -21,18 +23,25 @@ module.exports = (sequelize, DataTypes) => {
         password: {
             type: DataTypes.STRING,
             allowNull: false
-        },
-        rid: {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
+        }
     });
 
-    Users.assosiate = (models) => {
-        Users.hasMany(models.Roles, {
-            onDelete: "cascade"
+    Users.associate = (models) => {
+        Users.belongsTo(models.Roles, { foreignKey: 'rid' })
+    };
+
+    setTimeout(() => {
+        bcrypt.hash('admin', 11).then((hash) => {
+            Users.create({
+                email: 'kevinstoop9@gmail.com',
+                firstname: "Kevin",
+                lastname: "Stoop",
+                password: hash,
+                rid: 3
+            }).then(() => console.log("Super admin added"))
+                .catch(() => console.log("Super admin already created."));
         })
-    }
+    }, 500)
 
     return Users;
 }

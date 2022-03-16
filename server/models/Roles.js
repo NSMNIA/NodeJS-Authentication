@@ -7,9 +7,23 @@ module.exports = (sequelize, DataTypes) => {
         },
         role_name: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            unique: true,
         }
     });
+
+    Roles.associate = (models) => {
+        Roles.hasMany(models.Users, { foreignKey: 'rid' })
+    };
+
+    setTimeout(() => {
+        Roles.bulkCreate([
+            { role_name: 'client' },
+            { role_name: 'manager' },
+            { role_name: 'admin' },
+        ]).then(() => console.log("Roles added"))
+            .catch(() => console.error("Roles already existing"));
+    }, 500)
 
     return Roles;
 }

@@ -7,8 +7,7 @@ type Props = {}
 
 const Profile = (props: Props) => {
     const { authState } = useContext(AuthContext);
-    const [firstname, setFirstname] = useState(null);
-    const [lastname, setLastname] = useState(null);
+    const [profileData, setProfileData] = useState<any>(null);
 
     const [loading, setLoading] = useState(true);
 
@@ -19,8 +18,7 @@ const Profile = (props: Props) => {
             } as {}
         }).then(response => {
             if (response.data.success === 0) return Logging.error(response.data.message);
-            setFirstname(response.data.user.firstname);
-            setLastname(response.data.user.lastname);
+            setProfileData(response.data.user);
             setLoading(false);
         })
     }, []);
@@ -38,7 +36,18 @@ const Profile = (props: Props) => {
                 Profile
             </h1>
             <div>
-                {firstname} {lastname}
+                <div>
+                    <b>Email: </b>
+                    {profileData?.email}
+                </div>
+                <div>
+                    <b>Name: </b>
+                    {profileData?.firstname} {profileData?.lastname}
+                </div>
+                <div>
+                    <b>Role: </b>
+                    {profileData?.Role.role_name}
+                </div>
             </div>
         </>
     )
