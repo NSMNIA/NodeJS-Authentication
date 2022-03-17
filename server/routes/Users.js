@@ -80,4 +80,8 @@ router.post('/password/change', validateToken, async (req, res) => {
     })
 });
 
+router.post('/password/forgot', async (req, res) => {
+
+});
+
 module.exports = router;
