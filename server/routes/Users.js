@@ -3,6 +3,7 @@ const router = express.Router();
 const { Users, Roles } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 require('dotenv/config');
 const { validateToken } = require('../middleware/AuthMiddleware');
 
@@ -80,8 +81,29 @@ router.post('/password/change', validateToken, async (req, res) => {
     })
 });
 
-router.post('/password/forgot', async (req, res) => {
+router.get('/password/forgot', async (req, res) => {
+    let mailOptions = {
+        from: `"No-reply" <noreply@revolveddesign.com>`,
+        to: 'kevinstoop9@gmail.com',
+        subject: 'Hello',
+        text: 'Test email',
+        html: '<b>Test email</b>'
+    }
 
+    const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        secure: true,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        },
+    });
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) return res.json({ success: 0, message: "Something went wrong, please try again later." });
+        return res.json({ success: 1, message: 'Password reset email has been sent.' });
+    })
 });
 
 module.exports = router;
