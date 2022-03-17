@@ -3,9 +3,9 @@ const router = express.Router();
 const { Users, Roles } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
 require('dotenv/config');
 const { validateToken } = require('../middleware/AuthMiddleware');
+const { mailer } = require('../functions/Mailer');
 
 router.post('/register', async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
@@ -30,7 +30,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     await Users.findOne({ where: { email: email } }).then(user => {
-        if (!user) return res.json({ success: 0, message: 'User doens\'t exist' });
+        if (!user) return res.json({ success: 0, message: 'User doens\'t exist.' });
         bcrypt.compare(password, user.password).then((match) => {
             if (!match) return res.json({ success: 0, message: "Wrong email/password combination." });
             const accessToken = jwt.sign({ email: user.email, uid: user.uid }, process.env.JWT_SECRET, {
@@ -45,7 +45,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/check', validateToken, (req, res) => {
-    return res.json({ success: 1, message: 'User is authenticated', user: req.user });
+    return res.json({ success: 1, message: 'User is authenticated.', user: req.user });
 })
 
 router.get('/profile', validateToken, async (req, res) => {
@@ -56,7 +56,7 @@ router.get('/profile', validateToken, async (req, res) => {
             uid: req.user.uid
         }
     }).then((user) => {
-        if (!user) return res.json({ success: 0, message: 'User doens\'t exist' });
+        if (!user) return res.json({ success: 0, message: 'User doens\'t exist.' });
         user.password = undefined;
         return res.json({ success: 1, message: 'Succeeded with fetching data.', user: user });
     }).catch(err => {
@@ -68,7 +68,7 @@ router.get('/profile', validateToken, async (req, res) => {
 router.post('/password/change', validateToken, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     await Users.findOne({ where: { email: req.user.email } }).then(user => {
-        if (!user) return res.json({ success: 0, message: 'User doens\'t exist' });
+        if (!user) return res.json({ success: 0, message: 'User doens\'t exist.' });
         bcrypt.compare(currentPassword, user.password).then(async match => {
             if (!match) return res.json({ success: 0, message: "Wrong password entered." });
             bcrypt.hash(newPassword, 11).then(async hash => {
@@ -81,28 +81,14 @@ router.post('/password/change', validateToken, async (req, res) => {
     })
 });
 
-router.get('/password/forgot', async (req, res) => {
-    let mailOptions = {
-        from: `"No-reply" <noreply@revolveddesign.com>`,
-        to: 'kevinstoop9@gmail.com',
-        subject: 'Hello',
-        text: 'Test email',
-        html: '<b>Test email</b>'
-    }
-
-    const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        secure: true,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD
-        },
-    });
-
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) return res.json({ success: 0, message: "Something went wrong, please try again later." });
-        return res.json({ success: 1, message: 'Password reset email has been sent.' });
+router.post('/password/forgot', async (req, res) => {
+    const { email } = req.body;
+    await Users.findOne({ where: { email: email } }).then(user => {
+        if (!user) return res.json({ success: 0, message: 'Email doens\'t exist.' });
+        mailer(email, 'Password Reset', 'Please reset your password', '<b>Reset your password</b>').then((response) => {
+            if (response.success === 0) return res.send({ success: 0, message: 'Something went wrong, try again later.' });
+            return res.send({ success: 1, message: 'Email has been sent.' });
+        })
     })
 });
 

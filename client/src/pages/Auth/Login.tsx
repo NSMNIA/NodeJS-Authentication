@@ -63,6 +63,7 @@ const Login: React.FunctionComponent = (props: Props) => {
                 <ErrorText error={error} />
             </form>
             <small>
+                <p><Link to='/password/forgot'>Forgot password?</Link></p>
                 <p><Link to="/register">Register</Link></p>
             </small>
         </>

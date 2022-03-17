@@ -16,6 +16,7 @@ const PasswordChange = (props: Props) => {
 
     const changePassword = (e: React.SyntheticEvent) => {
         e.preventDefault();
+        if (error !== '') setError('');
         if (currentPassword.length === 0 || newPassword.length === 0 || confirmPassword.length === 0) return setError('All fields are required');
         if (newPassword !== confirmPassword) return setError('Please make sure your password match.');
         if (currentPassword === newPassword) return setError('Current password is equal to the new password.');

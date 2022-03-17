@@ -4,6 +4,7 @@ import Register from "../pages/Auth/Register";
 import Profile from "../pages/Auth/Profile";
 import Home from "../pages/Home";
 import PasswordChange from "../pages/Auth/Password/Change";
+import ForgotPassword from "../pages/Auth/Password/Forgot";
 
 const routes: IRoute[] = [
     {
@@ -33,6 +34,11 @@ const routes: IRoute[] = [
         element: PasswordChange,
         name: 'Change Password',
         protected: true
+    }, {
+        path: '/password/forgot',
+        element: ForgotPassword,
+        name: "Forgot Password",
+        protected: false
     }
 ];
 
