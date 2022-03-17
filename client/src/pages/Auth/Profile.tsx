@@ -1,6 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react'
-import Logging from '../config/Logging';
-import { AuthContext } from '../context/AuthContext'
+import Logging from '../../config/Logging';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext'
 import axios from 'axios';
 
 type Props = {}
@@ -10,6 +11,8 @@ const Profile = (props: Props) => {
     const [profileData, setProfileData] = useState<any>(null);
 
     const [loading, setLoading] = useState(true);
+
+    const history = useNavigate();
 
     useEffect(() => {
         axios.get(`${import.meta.env.VITE_APP_SERVER}/auth/profile`, {
@@ -47,6 +50,9 @@ const Profile = (props: Props) => {
                 <div>
                     <b>Role: </b>
                     {profileData?.Role.role_name}
+                </div>
+                <div>
+                    {authState.email === profileData?.email && (<button onClick={() => history('/password/change')}>Change password</button>)}
                 </div>
             </div>
         </>

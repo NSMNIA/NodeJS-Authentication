@@ -62,6 +62,22 @@ router.get('/profile', validateToken, async (req, res) => {
         console.error(err);
         return res.json({ success: 0, message: err });
     });
-})
+});
+
+router.post('/password/change', validateToken, async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    await Users.findOne({ where: { email: req.user.email } }).then(user => {
+        if (!user) return res.json({ success: 0, message: 'User doens\'t exist' });
+        bcrypt.compare(currentPassword, user.password).then(async match => {
+            if (!match) return res.json({ success: 0, message: "Wrong password entered." });
+            bcrypt.hash(newPassword, 11).then(async hash => {
+                await Users.update({ password: hash }, { where: { email: req.user.email } }).then(updated => {
+                    if (!updated) return res.json({ success: 0, message: "Something went wrong, try again later." });
+                    return res.json({ success: 1, message: "Password has been updated." });
+                })
+            })
+        })
+    })
+});
 
 module.exports = router;
