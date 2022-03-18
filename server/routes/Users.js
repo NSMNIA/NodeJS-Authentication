@@ -124,7 +124,7 @@ router.post('/verify', async (req, res) => {
     await Users.findOne({ where: {
         remember_token: remember_token
     }}).then(user => {
-        if(!user) return res.json({ success: 0, message: "No valid token"});
+        if(!user) return res.json({ success: 0, message: "No valid token!"});
         Users.update({
             remember_token: null,
             email_verified_at: Date.now()

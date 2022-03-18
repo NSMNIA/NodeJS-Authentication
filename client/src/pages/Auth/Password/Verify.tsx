@@ -12,17 +12,23 @@ const Verify = (props: Props) => {
 
     const history = useNavigate();
 
-    axios.post(`${import.meta.env.VITE_APP_SERVER}/auth/verify`, {
-        remember_token: id
-    },{
-        headers: {
-            "accessToken": localStorage.getItem("token")
-        } as {}
-    }).then(res => {
-        if(res.data.success === 0) return setError(res.data.message);
-        Logging.info(res.data.message);
-        return history('/login');
-    })
+    const verify = (remember_token: string) => {
+        axios.post(`${import.meta.env.VITE_APP_SERVER}/auth/verify`, {
+            remember_token: remember_token
+        },{
+            headers: {
+                "accessToken": localStorage.getItem("token")
+            } as {}
+        }).then(res => {
+            if(res.data.success === 0) return setError(res.data.message);
+            Logging.info(res.data.message);
+            return history('/login');
+        })
+    }
+
+    useEffect(()=>{
+        verify(id!!)
+    }, [])
 
     return (
         <>
