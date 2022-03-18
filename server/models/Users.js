@@ -45,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
                 firstname: "Kevin",
                 lastname: "Stoop",
                 password: hash,
+                email_verified_at: Date.now(),
                 rid: 3
             }).then(() => console.log("Super admin added"))
                 .catch(() => console.log("Super admin already created."));

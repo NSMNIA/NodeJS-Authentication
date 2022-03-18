@@ -18,9 +18,9 @@ module.exports = (sequelize, DataTypes) => {
 
     setTimeout(() => {
         Roles.bulkCreate([
-            { role_name: 'client' },
-            { role_name: 'manager' },
-            { role_name: 'admin' },
+            { role_name: 'Client' },
+            { role_name: 'Manager' },
+            { role_name: 'Admin' },
         ]).then(() => console.log("Roles added"))
             .catch(() => console.error("Roles already existing"));
     }, 500)

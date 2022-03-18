@@ -6,6 +6,7 @@ import Home from "../pages/Home";
 import PasswordChange from "../pages/Auth/Password/Change";
 import ForgotPassword from "../pages/Auth/Password/Forgot";
 import PasswordReset from "../pages/Auth/Password/Reset";
+import Verify from "../pages/Auth/Password/Verify";
 
 const routes: IRoute[] = [
     {
@@ -45,7 +46,12 @@ const routes: IRoute[] = [
         element: PasswordReset,
         name: "Reset Password",
         protected: false
-    },
+    }, {
+        path: '/verify/:id',
+        element: Verify,
+        name: "Verify account",
+        protected: false
+    }
 ];
 
 export default routes;

@@ -12,15 +12,20 @@ router.post('/register', async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
     await Users.findOne({ where: { email: email } }).then(user => {
         if (user) return res.json({ success: 0, message: 'Email is already in use.' });
+        const rememberToken = generateToken(69);
         bcrypt.hash(password, 11).then((hash) => {
             Users.create({
                 email: email,
                 firstname: firstname,
                 lastname: lastname,
                 password: hash,
-                rid: 1
+                rid: 1,
+                remember_token: rememberToken
             });
-            return res.json({ success: 1, message: "User is created." })
+            mailer(email, 'Verify email', 'Please verify your email', `<b>Verify your email <a target="_blank" href="${process.env.PRODUCTION_URL}/verify/${rememberToken}">Verify your email</a></b>`).then((response) => {
+                if (response.success === 0) return res.send({ success: 0, message: 'Something went wrong, try again later.' });
+                return res.send({ success: 1, message: 'Email verify has been sent.' });
+            })
         })
     }).catch(err => {
         console.error(err);
@@ -32,6 +37,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     await Users.findOne({ where: { email: email } }).then(user => {
         if (!user) return res.json({ success: 0, message: 'User doens\'t exist.' });
+        if(user.email_verified_at === null) return res.json({ success: 0, message: 'This email is not verified.'})
         bcrypt.compare(password, user.password).then((match) => {
             if (!match) return res.json({ success: 0, message: "Wrong email/password combination." });
             const accessToken = jwt.sign({ email: user.email, uid: user.uid }, process.env.JWT_SECRET, {
@@ -112,5 +118,25 @@ router.post('/password/reset', async (req, res)=> {
         })
     })
 })
+
+router.post('/verify', async (req, res) => {
+    const { remember_token } = req.body;
+    await Users.findOne({ where: {
+        remember_token: remember_token
+    }}).then(user => {
+        if(!user) return res.json({ success: 0, message: "No valid token"});
+        Users.update({
+            remember_token: null,
+            email_verified_at: Date.now()
+        }, {
+            where: {
+                remember_token: remember_token
+            }
+        }).then(updated => {
+            if(!updated) return res.json({success: 0, message: 'Something went wrong, try again later.'});
+            return res.json({success: 1, message: "Email has been verified."});
+        });
+    })
+});
 
 module.exports = router;
