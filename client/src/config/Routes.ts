@@ -5,6 +5,7 @@ import Profile from "../pages/Auth/Profile";
 import Home from "../pages/Home";
 import PasswordChange from "../pages/Auth/Password/Change";
 import ForgotPassword from "../pages/Auth/Password/Forgot";
+import PasswordReset from "../pages/Auth/Password/Reset";
 
 const routes: IRoute[] = [
     {
@@ -39,7 +40,12 @@ const routes: IRoute[] = [
         element: ForgotPassword,
         name: "Forgot Password",
         protected: false
-    }
+    }, {
+        path: '/password/reset/:id',
+        element: PasswordReset,
+        name: "Reset Password",
+        protected: false
+    },
 ];
 
 export default routes;

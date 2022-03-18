@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv/config');
 const { validateToken } = require('../middleware/AuthMiddleware');
 const { mailer } = require('../functions/Mailer');
+const { generateToken } = require('../functions/GenerateToken');
 
 router.post('/register', async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
@@ -85,11 +86,31 @@ router.post('/password/forgot', async (req, res) => {
     const { email } = req.body;
     await Users.findOne({ where: { email: email } }).then(user => {
         if (!user) return res.json({ success: 0, message: 'Email doens\'t exist.' });
-        mailer(email, 'Password Reset', 'Please reset your password', '<b>Reset your password</b>').then((response) => {
-            if (response.success === 0) return res.send({ success: 0, message: 'Something went wrong, try again later.' });
-            return res.send({ success: 1, message: 'Email has been sent.' });
+        const rememberToken = generateToken(69);
+        Users.update({remember_token: rememberToken}, {where: { email: email}}).then(updated => {
+            if(!updated) return res.json('Something went wrong, try again later.');
+            mailer(email, 'Password Reset', 'Please reset your password', `<b>Reset your password <a target="_blank" href="${process.env.PRODUCTION_URL}/password/reset/${rememberToken}">Reset your password</a></b>`).then((response) => {
+                if (response.success === 0) return res.send({ success: 0, message: 'Something went wrong, try again later.' });
+                return res.send({ success: 1, message: 'Email has been sent.' });
+            })
         })
     })
 });
+
+router.post('/password/reset', async (req, res)=> {
+    const {remember_token, email, password} = req.body;
+    await Users.findOne({where: {
+        email: email,
+        remember_token: remember_token
+    }}).then(user => {
+        if(!user) return res.json({success: 0, message: "Email or remember token is invalid."});
+        bcrypt.hash(password, 11).then(async hash => {
+            await Users.update({ password: hash, remember_token: null }, { where: { email: email, remember_token: remember_token } }).then(updated => {
+                if (!updated) return res.json({ success: 0, message: "Something went wrong, try again later." });
+                return res.json({ success: 1, message: "Your password has been reset successfully." });
+            })
+        })
+    })
+})
 
 module.exports = router;
