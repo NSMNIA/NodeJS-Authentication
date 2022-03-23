@@ -24,6 +24,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
+        profile_image: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
         email_verified_at: {
             type: DataTypes.DATE,
             allowNull: true

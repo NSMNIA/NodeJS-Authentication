@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 .env
+
+resources/static/assets/uploads

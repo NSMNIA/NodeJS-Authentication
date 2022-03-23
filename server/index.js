@@ -6,6 +6,8 @@ const session = require('express-session');
 require('dotenv/config');
 const db = require('./models');
 
+global.__basedir = __dirname;
+
 const app = express();
 
 let allowedOrigins = [

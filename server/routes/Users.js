@@ -7,6 +7,7 @@ require('dotenv/config');
 const { validateToken } = require('../middleware/AuthMiddleware');
 const { mailer } = require('../functions/Mailer');
 const { generateToken } = require('../functions/GenerateToken');
+const uploadFile = require('../middleware/FileMiddleware');
 
 router.post('/register', async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
@@ -37,7 +38,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     await Users.findOne({ where: { email: email } }).then(user => {
         if (!user) return res.json({ success: 0, message: 'User doens\'t exist.' });
-        if(user.email_verified_at === null) return res.json({ success: 0, message: 'This email is not verified.'})
+        if (user.email_verified_at === null) return res.json({ success: 0, message: 'This email is not verified.' })
         bcrypt.compare(password, user.password).then((match) => {
             if (!match) return res.json({ success: 0, message: "Wrong email/password combination." });
             const accessToken = jwt.sign({ email: user.email, uid: user.uid }, process.env.JWT_SECRET, {
@@ -93,8 +94,8 @@ router.post('/password/forgot', async (req, res) => {
     await Users.findOne({ where: { email: email } }).then(user => {
         if (!user) return res.json({ success: 0, message: 'Email doens\'t exist.' });
         const rememberToken = generateToken(69);
-        Users.update({remember_token: rememberToken}, {where: { email: email}}).then(updated => {
-            if(!updated) return res.json('Something went wrong, try again later.');
+        Users.update({ remember_token: rememberToken }, { where: { email: email } }).then(updated => {
+            if (!updated) return res.json('Something went wrong, try again later.');
             mailer(email, 'Password Reset', 'Please reset your password', `<b>Reset your password <a target="_blank" href="${process.env.PRODUCTION_URL}/password/reset/${rememberToken}">Reset your password</a></b>`).then((response) => {
                 if (response.success === 0) return res.send({ success: 0, message: 'Something went wrong, try again later.' });
                 return res.send({ success: 1, message: 'Email has been sent.' });
@@ -103,13 +104,15 @@ router.post('/password/forgot', async (req, res) => {
     })
 });
 
-router.post('/password/reset', async (req, res)=> {
-    const {remember_token, email, password} = req.body;
-    await Users.findOne({where: {
-        email: email,
-        remember_token: remember_token
-    }}).then(user => {
-        if(!user) return res.json({success: 0, message: "Email or remember token is invalid."});
+router.post('/password/reset', async (req, res) => {
+    const { remember_token, email, password } = req.body;
+    await Users.findOne({
+        where: {
+            email: email,
+            remember_token: remember_token
+        }
+    }).then(user => {
+        if (!user) return res.json({ success: 0, message: "Email or remember token is invalid." });
         bcrypt.hash(password, 11).then(async hash => {
             await Users.update({ password: hash, remember_token: null }, { where: { email: email, remember_token: remember_token } }).then(updated => {
                 if (!updated) return res.json({ success: 0, message: "Something went wrong, try again later." });
@@ -121,10 +124,12 @@ router.post('/password/reset', async (req, res)=> {
 
 router.post('/verify', async (req, res) => {
     const { remember_token } = req.body;
-    await Users.findOne({ where: {
-        remember_token: remember_token
-    }}).then(user => {
-        if(!user) return res.json({ success: 0, message: "No valid token!"});
+    await Users.findOne({
+        where: {
+            remember_token: remember_token
+        }
+    }).then(user => {
+        if (!user) return res.json({ success: 0, message: "No valid token!" });
         Users.update({
             remember_token: null,
             email_verified_at: Date.now()
@@ -133,10 +138,47 @@ router.post('/verify', async (req, res) => {
                 remember_token: remember_token
             }
         }).then(updated => {
-            if(!updated) return res.json({success: 0, message: 'Something went wrong, try again later.'});
-            return res.json({success: 1, message: "Email has been verified."});
+            if (!updated) return res.json({ success: 0, message: 'Something went wrong, try again later.' });
+            return res.json({ success: 1, message: "Email has been verified." });
         });
     })
 });
+
+router.post('/upload', validateToken, async (req, res) => {
+    const { uid, email } = req.user;
+    try {
+        await uploadFile(req, res);
+
+        if (req.file == undefined) {
+            return res.json({ success: 0, message: "Please upload a file!" });
+        }
+
+        await Users.update({
+            profile_image: req.file.filename
+        }, {
+            where: {
+                email: email,
+                uid: uid
+            }
+        }).then(updated => {
+            if (!updated) return res.json({ success: 0, message: 'Something went wrong, try again later.' });
+            return res.json({ success: 1, message: "Profile picture has been uploaded." });
+        });
+    } catch (err) {
+        console.log(err);
+
+        if (err.code == "LIMIT_FILE_SIZE") {
+            return res.json({
+                success: 0,
+                message: "File size cannot be larger than 2MB!",
+            });
+        }
+
+        res.json({
+            success: 0,
+            message: `Could not upload the file: ${req.file.originalname}. ${err}`,
+        });
+    }
+})
 
 module.exports = router;

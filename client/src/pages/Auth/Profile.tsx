@@ -3,14 +3,41 @@ import Logging from '../../config/Logging';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext'
 import axios from 'axios';
+import ErrorText from '../../components/ErrorText';
 
 type Props = {}
 
 const Profile = (props: Props) => {
     const { authState } = useContext(AuthContext);
     const [profileData, setProfileData] = useState<any>(null);
+    const [error, setError] = useState<string>('');
+    const [changing, setChanging] = useState<boolean>(false);
+
+    const [selectedFile, setSelectedFile] = React.useState<any>(null);
 
     const [loading, setLoading] = useState(true);
+
+    const uploadPhoto = (e: React.SyntheticEvent) => {
+        e.preventDefault()
+        setChanging(true);
+        if (error !== '') setError('');
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        axios.post(`${import.meta.env.VITE_APP_SERVER}/auth/upload`, formData, {
+            headers: {
+                "accessToken": localStorage.getItem("token")
+            } as {}
+        }).then(res => {
+            if (res.data.success === 0) return setError(res.data.message);
+            Logging.info(res.data.message);
+            setChanging(false);
+            return history('/profile');
+        }).catch(err => {
+            Logging.error(err);
+            setChanging(false);
+            return setError('Something went wrong, try again later.');
+        })
+    }
 
     const history = useNavigate();
 
@@ -54,6 +81,15 @@ const Profile = (props: Props) => {
                 <div>
                     {authState.email === profileData?.email && (<button onClick={() => history('/password/change')}>Change password</button>)}
                 </div>
+
+                <form action="" method="post" encType='multipart/form-data' onSubmit={uploadPhoto}>
+                    <input type="file" name='image' onChange={(e: any) => setSelectedFile(e.target.files[0])} />
+                    <button type="submit">
+                        Submit
+                    </button>
+
+                    <ErrorText error={error} />
+                </form>
             </div>
         </>
     )
