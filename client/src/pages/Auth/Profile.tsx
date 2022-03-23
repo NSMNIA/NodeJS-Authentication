@@ -31,7 +31,7 @@ const Profile = (props: Props) => {
             if (res.data.success === 0) return setError(res.data.message);
             Logging.info(res.data.message);
             setChanging(false);
-            return history('/profile');
+            return getProfile();;
         }).catch(err => {
             Logging.error(err);
             setChanging(false);
@@ -41,7 +41,7 @@ const Profile = (props: Props) => {
 
     const history = useNavigate();
 
-    useEffect(() => {
+    const getProfile = () => {
         axios.get(`${import.meta.env.VITE_APP_SERVER}/auth/profile`, {
             headers: {
                 "accessToken": localStorage.getItem("token")
@@ -51,6 +51,10 @@ const Profile = (props: Props) => {
             setProfileData(response.data.user);
             setLoading(false);
         })
+    }
+
+    useEffect(() => {
+        getProfile();
     }, []);
 
     if (loading) return (
@@ -79,12 +83,15 @@ const Profile = (props: Props) => {
                     {profileData?.Role.role_name}
                 </div>
                 <div>
+                    <img src={`${import.meta.env.VITE_APP_SERVER}/uploads/${profileData?.profile_image}`} alt="profile_image" />
+                </div>
+                <div>
                     {authState.email === profileData?.email && (<button onClick={() => history('/password/change')}>Change password</button>)}
                 </div>
 
                 <form action="" method="post" encType='multipart/form-data' onSubmit={uploadPhoto}>
                     <input type="file" name='image' onChange={(e: any) => setSelectedFile(e.target.files[0])} />
-                    <button type="submit">
+                    <button type="submit" disabled={changing}>
                         Submit
                     </button>
 

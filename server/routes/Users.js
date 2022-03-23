@@ -3,6 +3,7 @@ const router = express.Router();
 const { Users, Roles } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 require('dotenv/config');
 const { validateToken } = require('../middleware/AuthMiddleware');
 const { mailer } = require('../functions/Mailer');
@@ -148,32 +149,39 @@ router.post('/upload', validateToken, async (req, res) => {
     const { uid, email } = req.user;
     try {
         await uploadFile(req, res);
-
         if (req.file == undefined) {
             return res.json({ success: 0, message: "Please upload a file!" });
         }
 
-        await Users.update({
-            profile_image: req.file.filename
-        }, {
+        await Users.findOne({
             where: {
                 email: email,
                 uid: uid
             }
-        }).then(updated => {
-            if (!updated) return res.json({ success: 0, message: 'Something went wrong, try again later.' });
-            return res.json({ success: 1, message: "Profile picture has been uploaded." });
+        }).then(user => {
+            if (!user) return res.json({ success: 0, message: "No user found!" });
+            const profile_image = user.profile_image;
+            const removeFile = `${__basedir}/resources/static/assets/uploads/${profile_image}`;
+            if (fs.existsSync(removeFile)) fs.unlinkSync(removeFile);
+            Users.update({
+                profile_image: req.file.filename
+            }, {
+                where: {
+                    email: email,
+                    uid: uid
+                }
+            }).then(updated => {
+                if (!updated) return res.json({ success: 0, message: 'Something went wrong, try again later.' });
+                return res.json({ success: 1, message: "Profile picture has been uploaded." });
+            });
         });
     } catch (err) {
-        console.log(err);
-
         if (err.code == "LIMIT_FILE_SIZE") {
             return res.json({
                 success: 0,
                 message: "File size cannot be larger than 2MB!",
             });
         }
-
         res.json({
             success: 0,
             message: `Could not upload the file: ${req.file.originalname}. ${err}`,
