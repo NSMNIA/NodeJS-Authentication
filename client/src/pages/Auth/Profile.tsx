@@ -83,10 +83,7 @@ const Profile = (props: Props) => {
                     {profileData?.Role.role_name}
                 </div>
                 <div>
-                    <img src={`${import.meta.env.VITE_APP_SERVER}/uploads/${profileData?.profile_image}`} alt="profile_image" />
-                </div>
-                <div>
-                    {authState.email === profileData?.email && (<button onClick={() => history('/password/change')}>Change password</button>)}
+                    <img height="450" src={`${import.meta.env.VITE_APP_SERVER}/uploads/${profileData?.profile_image}`} alt="profile_image" />
                 </div>
 
                 <form action="" method="post" encType='multipart/form-data' onSubmit={uploadPhoto}>
@@ -97,6 +94,9 @@ const Profile = (props: Props) => {
 
                     <ErrorText error={error} />
                 </form>
+                <div>
+                    {authState.email === profileData?.email && (<button onClick={() => history('/password/change')}>Change password</button>)}
+                </div>
             </div>
         </>
     )

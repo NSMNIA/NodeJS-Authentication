@@ -11,7 +11,8 @@ global.__basedir = __dirname;
 const app = express();
 
 let allowedOrigins = [
-    `${process.env.PRODUCTION_URL}`
+    `${process.env.PRODUCTION_URL}`,
+    `${process.env.LIVE_URL}`
 ];
 
 app.use(cors({
