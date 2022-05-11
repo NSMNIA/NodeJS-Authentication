@@ -1,4 +1,4 @@
 # NodeJS-Authentication
 Frontend application with authentication via Express in combination with JWT.
 
-![video](na.webm)
+![Example of working product](https://raw.githubusercontent.com/NSMNIA/NodeJS-Authentication/master/na.webm)
