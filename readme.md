@@ -2,7 +2,7 @@
 Frontend application with authentication via Express in combination with JWT.
 
 ## How it works
-If you visit a route it will determine if it is a protected route or not. If it is a protected route it will be checking the if the context state credentials match with the JWT on the backend and will it determine if it is valid or not. Whether the credentials and the is legitimate, you'll see the page; otherwise, you will be sent to the login page.
+If you visit a route it will determine if it is a protected route or not. If it is a protected route it will be checking if the context state credentials match with the JWT on the backend. Whether the credentials and the is legitimate, you'll see the page; otherwise, you will be sent to the login page.
 
 If the routes are in the 'route.ts' file, the project will automatically generate them.
 ![Route](route.png)
