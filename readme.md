@@ -22,4 +22,4 @@ All information stored in the authentication context can be retrieved per page. 
 ![Context](context.png)
 
 ## Working example
-![Check the example of the working product](https://raw.githubusercontent.com/NSMNIA/NodeJS-Authentication/master/na.webm)
+![Check out the example of the working product](https://raw.githubusercontent.com/NSMNIA/NodeJS-Authentication/master/na.webm)
