@@ -1,5 +1,12 @@
 # NodeJS-Authentication
-Frontend application with authentication via Express in combination with JWT.
+Frontend application with authentication via Express in combination with JSONWebTokens (JWT).
+
+## The goal
+The purpose of this proof of concept is to see if a secure authentication can be made, which can later be used for projects involving authentication.
+
+For the frontend, React is used in combination with `Axios`. For the backend NodeJS is used in combination with `Express` and `Sequelize`.
+
+I have chosen for a self-made NodeJS server because it is easier for me to extend it.
 
 ## How it works
 If you visit a route, it will determine if it is a protected route or not. If it is a protected route, it will be checking if the context state credentials match with the JWT on the backend. Whether the credentials and the JWT are legitimate, you'll see the page; otherwise, you will be sent to the login page.
